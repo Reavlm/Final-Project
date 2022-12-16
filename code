@@ -1,0 +1,76 @@
+# SDEV 140 - M08 Final Project 
+# Diego Aguilera
+# 12/5/2022
+# Play sorry with two die, and one peg. Move your piece down the board first. 
+# But rolling certain numbers will change the speed of the game.
+
+from tkinter import *
+import random
+# Prompt the user for the number of players
+num_players = int(input("Enter the number of players (2-4): "))
+# Create list of players
+players = []
+for i in range(num_players):
+	# Prompt user for the name of player
+	name = input(f"Enter the name of player {i+1}: ")
+	players.append(name)
+# Define the playing board with 50 spaces
+board = [0] * 50
+# Create two dice with special conditions
+die1 = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+die2 = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+# Function roll the dice
+def roll_dice():
+	roll1 = die1[random.randint(0, len(die1)-1)]
+	roll2 = die2[random.randint(0, len(die2)-1)]
+	return roll1, roll2
+# Function move the player on the board
+def move_player(player, roll):
+	# Update position of player on the board
+	board[player] += roll
+	# Check if the player has landed on the same space as another player
+	for i in range(num_players):
+		if i != player and board[i] == board[player]:
+			board[i] = 0
+# Function display the board on the screen
+def display_board():
+	for i in range(num_players):
+		print(f"{players[i]}: {board[i]}")
+# Keep track of the number of rolls for each player
+rolls = [0] * num_players
+# Game loop
+while True:
+	# Loop through each player
+	for i in range(num_players):
+		# Roll the dice
+		roll1, roll2 = roll_dice()
+		# If the player rolls a double, they get another roll
+		if roll1 == roll2:
+			rolls[i] += 1
+			# If the player rolls two doubles in a row, they start over
+			if rolls[i] == 2:
+				board[i] = 0
+				rolls[i] = 0
+			else:
+				# Move the player on the board according to the roll
+				move_player(i, roll1)
+		else:
+			# Reset the number of rolls for the player
+			rolls[i] = 0
+			# Move the player on the board according to the roll
+			move_player(i, roll1)
+		# Check if player has reached the winning space
+		if board[i] >= 50:
+			# Announce the winner
+			print(f"{players[i]} wins!")
+			# Ask the user if they want to play again
+			play_again = input("Would you like to play again (yes/no)? ")
+			if play_again.lower() == "yes":
+				# Reset the board and the rolls
+				board = [0] * 50
+				rolls = [0] * num_players
+			else:
+				# End the game
+				exit()
+		# Display the board on the screen
+		display_board()
